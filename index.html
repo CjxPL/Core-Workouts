@@ -3,176 +3,218 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Core 10 — obwód domowy</title>
-<meta name="theme-color" content="#0E1F29">
+<title>CORE — obwód domowy</title>
+<meta name="theme-color" content="#09090A">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Karla:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#0E1F29; --ink2:#16303D; --chalk:#F0EDE6;
-  --dim:rgba(240,237,230,.60); --line:rgba(240,237,230,.14);
-  --sage:#A8C9A0; --clay:#E9A176; --r:14px;
+  --bg:#09090A; --surf:#141417; --surf2:#1B1B20;
+  --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.18);
+  --fg:#F4F3F1; --dim:rgba(244,243,241,.52);
+  --red:#FF3B2B; --bone:#EDEAE4; --ink:#0A0A0B;
+  --r:4px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
-  background:var(--ink);color:var(--chalk);
-  font-family:"Karla",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
-  padding:0 0 max(28px,env(safe-area-inset-bottom));
+  background:var(--bg);color:var(--fg);
+  font-family:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;
+  padding:0 0 max(32px,env(safe-area-inset-bottom));
 }
-.wrap{max-width:640px;margin:0 auto;padding:0 18px}
+.wrap{max-width:660px;margin:0 auto;padding:0 16px}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+.lbl{font-family:"JetBrains Mono",monospace;font-size:.62rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--dim)}
 
-.masthead{padding:26px 0 18px}
-.eyebrow{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.66rem;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin:0 0 8px}
-.masthead h1{font-family:"Bricolage Grotesque","Karla",sans-serif;font-weight:700;
-  font-size:clamp(1.9rem,8vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
-.masthead p{color:var(--dim);margin:10px 0 0;font-size:.94rem;max-width:44ch}
+/* ---------- nagłówek ---------- */
+.masthead{padding:24px 0 16px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+.masthead h1{font-family:"Archivo Black",sans-serif;font-size:clamp(2.4rem,13vw,4rem);
+  line-height:.84;letter-spacing:-.035em;margin:6px 0 0;text-transform:uppercase}
+.masthead h1 em{font-style:normal;color:var(--red)}
+.tagline{color:var(--dim);font-size:.86rem;line-height:1.4;text-align:right;max-width:15ch;flex:none}
 
-/* ---------- panel: cały kontener zmienia kolor ---------- */
+/* ---------- panel ---------- */
 .panel{
-  position:sticky;top:0;z-index:20;border:1px solid;border-radius:var(--r);
-  overflow:hidden;margin:6px 0 22px;
-  background:var(--pBg);color:var(--pFg);border-color:var(--pLine);
-  transition:background .3s ease,color .3s ease,border-color .3s ease;
+  position:sticky;top:0;z-index:30;border-radius:var(--r);overflow:hidden;
+  margin:4px 0 18px;background:var(--pBg);color:var(--pFg);
+  transition:background .28s ease,color .28s ease;
 }
-.panel[data-phase="idle"]{--pBg:var(--ink2);--pFg:var(--chalk);
-  --pDim:rgba(240,237,230,.60);--pLine:rgba(240,237,230,.16);
-  --pTrack:rgba(240,237,230,.10);--pFill:rgba(240,237,230,.22);
-  --bBg:var(--sage);--bFg:#10222B}
-.panel[data-phase="work"]{--pBg:var(--sage);--pFg:#0F2116;
-  --pDim:rgba(15,33,22,.66);--pLine:rgba(15,33,22,.24);
-  --pTrack:rgba(15,33,22,.16);--pFill:#0F2116;
-  --bBg:#0F2116;--bFg:var(--sage)}
-.panel[data-phase="rest"]{--pBg:var(--clay);--pFg:#33170A;
-  --pDim:rgba(51,23,10,.66);--pLine:rgba(51,23,10,.24);
-  --pTrack:rgba(51,23,10,.16);--pFill:#33170A;
-  --bBg:#33170A;--bFg:var(--clay)}
-.bar{height:5px;background:var(--pTrack)}
-.bar span{display:block;height:100%;width:100%;background:var(--pFill);transform-origin:left center}
-.panel-in{padding:18px 18px 16px;text-align:center}
-.phase{font-family:"JetBrains Mono",monospace;font-size:.68rem;letter-spacing:.22em;
-  text-transform:uppercase;color:var(--pDim);margin:0 0 4px}
-.clock{font-family:"JetBrains Mono",monospace;font-weight:700;font-variant-numeric:tabular-nums;
-  font-size:clamp(4rem,21vw,6.2rem);line-height:.92;letter-spacing:-.03em;margin:2px 0 6px}
-.now{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;
-  font-size:clamp(1.15rem,5vw,1.5rem);line-height:1.15;margin:0}
-.next{color:var(--pDim);font-size:.86rem;margin:6px 0 0;min-height:1.3em}
-.controls{display:flex;gap:8px;padding:0 14px 16px}
-.controls button{font-family:"Karla",sans-serif;font-size:.95rem;font-weight:600;
-  color:var(--pFg);background:transparent;border:1px solid var(--pLine);border-radius:10px;
-  padding:12px 10px;cursor:pointer;flex:1;transition:background .15s ease,opacity .15s ease}
-.controls button:hover{background:var(--pTrack)}
+.panel[data-phase="idle"]{--pBg:var(--surf);--pFg:var(--fg);
+  --pDim:rgba(244,243,241,.52);--pLine:rgba(255,255,255,.14);
+  --mDone:var(--red);--mNow:var(--red);--mNext:rgba(255,255,255,.14);
+  --bBg:var(--red);--bFg:#fff}
+.panel[data-phase="work"]{--pBg:var(--red);--pFg:#120603;
+  --pDim:rgba(18,6,3,.62);--pLine:rgba(18,6,3,.26);
+  --mDone:rgba(18,6,3,.55);--mNow:#120603;--mNext:rgba(18,6,3,.20);
+  --bBg:#120603;--bFg:var(--red)}
+.panel[data-phase="rest"]{--pBg:var(--bone);--pFg:#141414;
+  --pDim:rgba(20,20,20,.58);--pLine:rgba(20,20,20,.22);
+  --mDone:rgba(20,20,20,.55);--mNow:#141414;--mNext:rgba(20,20,20,.16);
+  --bBg:#141414;--bFg:var(--bone)}
+
+/* mapa sesji */
+.map{display:flex;gap:2px;padding:10px 12px 0;height:22px;align-items:stretch}
+.map i{flex:1;min-width:1px;background:var(--mNext);border-radius:1px;transition:background .2s}
+.map i.done{background:var(--mDone);opacity:.5}
+.map i.now{background:var(--mNow)}
+.map i.rest{opacity:.35}
+
+.panel-in{padding:6px 18px 14px;text-align:center}
+.phase{font-family:"JetBrains Mono",monospace;font-size:.62rem;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--pDim);margin:6px 0 0}
+.clock{font-family:"Archivo Black",sans-serif;font-variant-numeric:tabular-nums;
+  font-size:clamp(4.6rem,26vw,8rem);line-height:.8;letter-spacing:-.05em;margin:8px 0 4px}
+.now{font-family:"Archivo Black",sans-serif;text-transform:uppercase;
+  font-size:clamp(1.05rem,4.6vw,1.4rem);line-height:1.05;letter-spacing:-.015em;margin:0}
+.next{color:var(--pDim);font-size:.8rem;margin:7px 0 0;min-height:1.2em;
+  font-family:"JetBrains Mono",monospace;letter-spacing:.02em}
+
+/* pasek odcinka */
+.bar{height:6px;background:var(--pLine);margin:12px 0 0}
+.bar span{display:block;height:100%;width:100%;background:var(--pFg);transform-origin:left center}
+
+.controls{display:flex;gap:6px;padding:12px}
+.controls button{font-family:"Archivo",sans-serif;font-size:.82rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--pFg);background:transparent;
+  border:1.5px solid var(--pLine);border-radius:var(--r);padding:14px 8px;cursor:pointer;
+  flex:1;transition:background .15s,opacity .15s}
+.controls button:hover{background:var(--pLine)}
 .controls button:focus-visible{outline:2px solid var(--pFg);outline-offset:2px}
-.controls button.primary{background:var(--bBg);border-color:var(--bBg);color:var(--bFg);flex:2}
-.controls button.primary:hover{opacity:.86;background:var(--bBg)}
+.controls button.primary{background:var(--bBg);border-color:var(--bBg);color:var(--bFg);flex:1.9}
+.controls button.primary:hover{opacity:.85;background:var(--bBg)}
 
-/* ---------- bloki ---------- */
-.opts{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin:0 0 26px}
-.opts h2{font-family:"JetBrains Mono",monospace;font-weight:400;font-size:.66rem;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin:0 0 12px}
-.blk{display:flex;align-items:center;gap:12px;padding:11px 0;cursor:pointer;
-  border-bottom:1px solid var(--line)}
-.blk:last-of-type{border-bottom:none}
-.blk input{margin:0;accent-color:var(--sage);width:19px;height:19px;flex:none}
-.blk .bn{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;font-size:1rem;
-  line-height:1.2;display:block}
-.blk .bm{font-family:"JetBrains Mono",monospace;font-size:.68rem;letter-spacing:.06em;
-  color:var(--dim);display:block;margin-top:2px}
-.blk input:not(:checked)~div{opacity:.42}
-.blk div{flex:1;transition:opacity .18s ease}
+/* ---------- kafle bloków ---------- */
+.sechead{display:flex;align-items:baseline;justify-content:space-between;
+  margin:26px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{position:relative;display:block;cursor:pointer;background:var(--surf);
+  border:1.5px solid var(--line);border-radius:var(--r);padding:13px 14px;
+  transition:border-color .18s,background .18s}
+.tile input{position:absolute;opacity:0;width:0;height:0}
+.tile .tn{font-family:"Archivo Black",sans-serif;text-transform:uppercase;
+  font-size:1rem;line-height:1.05;letter-spacing:-.01em;color:var(--dim);transition:color .18s}
+.tile .tm{font-family:"JetBrains Mono",monospace;font-size:.64rem;letter-spacing:.06em;
+  color:var(--dim);margin-top:5px;display:block}
+.tile .dot{position:absolute;top:13px;right:13px;width:9px;height:9px;border-radius:50%;
+  background:transparent;border:1.5px solid var(--line2);transition:background .18s,border-color .18s}
+.tile.on{border-color:var(--red);background:rgba(255,59,43,.08)}
+.tile.on .tn{color:var(--fg)}
+.tile.on .dot{background:var(--red);border-color:var(--red)}
+.tile:focus-within{outline:2px solid var(--red);outline-offset:2px}
 
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 12px}
-.step{border:1px solid var(--line);border-radius:10px;padding:9px 10px}
-.step .lbl{display:block;font-family:"JetBrains Mono",monospace;font-size:.6rem;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 6px}
-.row{display:flex;align-items:center;gap:6px}
-.row button{font-family:"JetBrains Mono",monospace;font-size:1.05rem;line-height:1;
-  color:var(--chalk);background:transparent;border:1px solid var(--line);border-radius:8px;
-  width:34px;height:34px;flex:none;cursor:pointer;transition:background .15s,border-color .15s}
-.row button:hover{background:rgba(240,237,230,.08);border-color:var(--sage)}
-.row button:focus-visible{outline:2px solid var(--sage);outline-offset:2px}
-.row button:disabled{opacity:.3;cursor:not-allowed}
-.row output{flex:1;text-align:center;font-family:"JetBrains Mono",monospace;font-weight:700;
-  font-variant-numeric:tabular-nums;font-size:1rem}
-.est{font-family:"JetBrains Mono",monospace;font-size:.72rem;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--sage);margin:0 0 12px;padding:0 2px}
-.opt{display:flex;align-items:center;gap:11px;padding:6px 0;cursor:pointer}
-.opt input{margin:0;accent-color:var(--sage);width:17px;height:17px;flex:none}
-.opt span{font-size:.92rem}
+/* ---------- statystyki sesji ---------- */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 0}
+.stat{background:var(--surf);border-radius:var(--r);padding:12px 13px}
+.stat b{display:block;font-family:"Archivo Black",sans-serif;font-size:1.75rem;
+  line-height:.95;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stat span{display:block;font-family:"JetBrains Mono",monospace;font-size:.58rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-top:6px}
+.stat.hero b{color:var(--red)}
 
-.sect{font-family:"JetBrains Mono",monospace;font-size:.66rem;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--dim);margin:30px 0 12px;
-  padding-bottom:8px;border-bottom:1px solid var(--line)}
-.card{border:1px solid var(--line);border-radius:var(--r);padding:15px 16px;margin:0 0 10px;
-  transition:border-color .2s ease,background .2s ease}
-.card.live{border-color:var(--sage);background:rgba(168,201,160,.08)}
-.card .tag{font-family:"JetBrains Mono",monospace;font-size:.62rem;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--clay);margin:0 0 5px}
-.card h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;font-size:1.12rem;
-  line-height:1.2;margin:0 0 6px;letter-spacing:-.01em}
-.card p{margin:0 0 12px;font-size:.9rem;color:var(--dim);line-height:1.5}
-.yt{display:inline-flex;align-items:center;gap:7px;font-family:"JetBrains Mono",monospace;
-  font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;
-  color:var(--chalk);border:1px solid var(--line);border-radius:999px;padding:7px 13px;
-  transition:border-color .15s ease,color .15s ease}
-.yt:hover{border-color:var(--clay);color:var(--clay)}
-.yt:focus-visible{outline:2px solid var(--sage);outline-offset:2px}
-.yt svg{width:13px;height:13px;flex:none}
+/* ---------- suwaki ---------- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 0}
+.step{background:var(--surf);border-radius:var(--r);padding:10px 12px}
+.step .sl{display:block;font-family:"JetBrains Mono",monospace;font-size:.58rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:7px}
+.row{display:flex;align-items:center;gap:5px}
+.row button{font-family:"Archivo",sans-serif;font-size:1.15rem;font-weight:700;line-height:1;
+  color:var(--fg);background:var(--surf2);border:none;border-radius:var(--r);
+  width:36px;height:36px;flex:none;cursor:pointer;transition:background .15s,color .15s}
+.row button:hover{background:var(--red);color:#fff}
+.row button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.row button:disabled{opacity:.25;cursor:not-allowed;background:var(--surf2);color:var(--fg)}
+.row output{flex:1;text-align:center;font-family:"Archivo Black",sans-serif;
+  font-variant-numeric:tabular-nums;font-size:1.05rem}
 
-footer{color:var(--dim);font-size:.82rem;line-height:1.6;margin:34px 0 0;
-  padding-top:16px;border-top:1px solid var(--line)}
-footer b{color:var(--chalk);font-weight:600}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* ---------- przełączniki dźwięku ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0}
+.chip{position:relative;cursor:pointer;background:var(--surf);border:1.5px solid var(--line);
+  border-radius:999px;padding:8px 14px;font-family:"JetBrains Mono",monospace;
+  font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);
+  transition:border-color .18s,color .18s,background .18s}
+.chip input{position:absolute;opacity:0;width:0;height:0}
+.chip.on{border-color:var(--red);color:var(--fg);background:rgba(255,59,43,.08)}
+.chip:focus-within{outline:2px solid var(--red);outline-offset:2px}
+
+/* ---------- karty ćwiczeń ---------- */
+.blockwrap{margin-top:30px;transition:opacity .22s}
+.blockwrap.off{opacity:.34}
+.bh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding-bottom:8px;border-bottom:2px solid var(--line);margin-bottom:12px}
+.bh h2{font-family:"Archivo Black",sans-serif;text-transform:uppercase;font-size:1.15rem;
+  letter-spacing:-.02em;margin:0}
+.card{display:flex;gap:14px;background:var(--surf);border:1.5px solid transparent;
+  border-radius:var(--r);padding:14px 15px;margin:0 0 6px;transition:border-color .2s,background .2s}
+.card.live{border-color:var(--red);background:rgba(255,59,43,.09)}
+.num{font-family:"Archivo Black",sans-serif;font-size:1.6rem;line-height:1;
+  color:rgba(244,243,241,.16);flex:none;width:36px;font-variant-numeric:tabular-nums;
+  transition:color .2s}
+.card.live .num{color:var(--red)}
+.card .tag{font-family:"JetBrains Mono",monospace;font-size:.58rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--red);margin:0 0 4px}
+.card h3{font-family:"Archivo",sans-serif;font-weight:700;font-size:1.02rem;
+  line-height:1.2;margin:0 0 6px}
+.card p{margin:0 0 11px;font-size:.87rem;color:var(--dim);line-height:1.5}
+.yt{display:inline-flex;align-items:center;gap:6px;font-family:"JetBrains Mono",monospace;
+  font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;
+  color:var(--fg);border:1.5px solid var(--line2);border-radius:999px;padding:7px 12px;
+  transition:border-color .15s,background .15s}
+.yt:hover{border-color:var(--red);background:rgba(255,59,43,.12)}
+.yt:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.yt svg{width:12px;height:12px;flex:none}
+
+footer{color:var(--dim);font-size:.8rem;line-height:1.6;margin:36px 0 0;
+  padding-top:18px;border-top:2px solid var(--line)}
+footer b{color:var(--fg);font-weight:700}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <header class="masthead">
-    <p class="eyebrow">Obwód domowy · bez sprzętu</p>
-    <h1>Core 10</h1>
-    <p>Złóż sesję z bloków. Trzy razy w tygodniu, o tej samej porze — przez pierwsze sześć tygodni bez zmian.</p>
+    <div>
+      <p class="lbl">Obwód domowy · bez sprzętu</p>
+      <h1>Core<em>.</em></h1>
+    </div>
+    <p class="tagline">Ta sama pora, trzy razy w tygodniu</p>
   </header>
 
   <section class="panel" id="panel" data-phase="idle" aria-live="polite">
-    <div class="bar"><span id="bar"></span></div>
+    <div class="map" id="map"></div>
     <div class="panel-in">
       <p class="phase" id="phase">Gotowe</p>
       <div class="clock" id="clock">00:30</div>
-      <p class="now" id="now">Rozłóż matę i naciśnij start</p>
+      <p class="now" id="now">Rozłóż matę</p>
       <p class="next" id="next"></p>
     </div>
+    <div class="bar"><span id="bar"></span></div>
     <div class="controls">
       <button class="primary" id="btnStart">Start</button>
       <button id="btnSkip">Dalej</button>
-      <button id="btnReset">Od nowa</button>
+      <button id="btnReset">Reset</button>
     </div>
   </section>
 
-  <section class="opts">
-    <h2>Bloki sesji</h2>
-    <div id="blocks"></div>
-    <div class="grid" id="steppers"></div>
-    <p class="est" id="est"></p>
-    <label class="opt">
-      <input type="checkbox" id="optBell" checked>
-      <span>Dzwonek przy zmianie odcinka</span>
-    </label>
-    <label class="opt">
-      <input type="checkbox" id="optTick" checked>
-      <span>Odliczanie ostatnich 5 sekund</span>
-    </label>
-  </section>
+  <div class="sechead"><span class="lbl">Bloki sesji</span><span class="lbl" id="blkCount"></span></div>
+  <div class="tiles" id="blocks"></div>
+
+  <div class="stats" id="stats"></div>
+  <div class="grid" id="steppers"></div>
+  <div class="chips" id="chips">
+    <label class="chip on"><input type="checkbox" id="optBell" checked>Dzwonek</label>
+    <label class="chip on"><input type="checkbox" id="optTick" checked>Odliczanie 5 s</label>
+  </div>
 
   <div id="lists"></div>
 
   <footer>
     <b>Technika przed czasem.</b> Lepiej 20 sekund deski z biodrami w linii niż 60 sekund z opadniętym lędźwiem. Jeśli forma się sypie — kończ serię wcześniej.<br><br>
     <b>Wydłużaj czas, nie liczbę rund.</b> Najpierw 30 → 40 → 45 s pracy przy tej samej liczbie rund. Czwarta runda ma sens dopiero, gdy trzy są łatwe technicznie, nie tylko kondycyjnie.<br><br>
-    <b>Blok nóg nie musi być na każdej sesji.</b> Dwa razy w tygodniu wystarczy — mięśnie nóg potrzebują dnia przerwy, brzuch znosi codzienną pracę znacznie lepiej.<br><br>
+    <b>Blok nóg nie musi być na każdej sesji.</b> Dwa razy w tygodniu wystarczy — nogi potrzebują dnia przerwy, brzuch znosi codzienną pracę znacznie lepiej.<br><br>
     <b>Ból to stop.</b> Kłucie w lędźwiach albo w karku oznacza koniec ćwiczenia, nie „jeszcze pięć sekund”.
   </footer>
 
@@ -182,7 +224,7 @@ footer b{color:var(--chalk);font-weight:600}
 /* ---------- dane ---------- */
 const BLOCKS = {
   warm:{ name:"Rozgrzewka", note:"2 min skakania", fixed:true, list:false },
-  core:{ name:"Core", note:"", list:true, ex:[
+  core:{ name:"Core", list:true, ex:[
     { tag:"Antywyprost", name:"Dead bug",
       cue:"Leż na plecach, ręce w górę, kolana nad biodrami. Opuszczaj przeciwległą rękę i nogę. Lędźwie przyklejone do podłogi — jeśli odstają, zmniejsz zakres.",
       q:"dead bug ćwiczenie technika" },
@@ -199,7 +241,7 @@ const BLOCKS = {
       cue:"Leż na plecach, stopy blisko pośladków. Wypchnij biodra siłą pośladków, nie lędźwiami. Na górze krótka pauza, potem powoli w dół.",
       q:"mostek biodrowy glute bridge technika" }
   ]},
-  legs:{ name:"Nogi i pośladki", note:"", list:true, ex:[
+  legs:{ name:"Nogi i pośladki", list:true, ex:[
     { tag:"Wzorzec przysiadu", name:"Przysiad z krzesłem",
       cue:"Krzesło za tobą. Siadaj biodrami do tyłu aż pośladki dotkną siedziska, wstań bez odbijania się. Kolana w linii ze stopami, pięty na podłodze.",
       q:"przysiad do krzesła technika box squat" },
@@ -219,43 +261,51 @@ const BLOCKS = {
       q:"skakanka technika dla początkujących" }
   ]}
 };
-const ORDER = ["warm","core","legs","fin"];
-const DEFAULT_ON = { warm:false, core:true, legs:false, fin:false };
-
+const ORDER=["warm","core","legs","fin"];
+const DEFAULT_ON={warm:false,core:true,legs:false,fin:false};
 const YT="https://www.youtube.com/results?search_query=";
 const play=`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>`;
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
+const pad2=n=>String(n).padStart(2,"0");
 
-/* ---------- listy ćwiczeń ---------- */
+/* ---------- listy ---------- */
 $("lists").innerHTML = ORDER.filter(k=>BLOCKS[k].list).map(k=>{
   const b=BLOCKS[k];
-  return `<p class="sect" id="head_${k}">${b.name}</p>` + b.ex.map((e,i)=>`
-    <article class="card" data-ex="${k}${i}">
-      <p class="tag">${e.tag}${e.sides?" · obie strony":""}</p>
-      <h3>${e.name}</h3>
-      <p>${e.cue}</p>
-      <a class="yt" href="${YT+encodeURIComponent(e.q)}" target="_blank" rel="noopener">
-        ${play} Zobacz technikę</a>
-    </article>`).join("");
+  return `<div class="blockwrap" id="wrap_${k}">
+    <div class="bh"><h2>${b.name}</h2><span class="lbl" id="head_${k}"></span></div>
+    ${b.ex.map((e,i)=>`
+      <article class="card" data-ex="${k}${i}">
+        <div class="num">${pad2(i+1)}</div>
+        <div>
+          <p class="tag">${e.tag}${e.sides?" · obie strony":""}</p>
+          <h3>${e.name}</h3>
+          <p>${e.cue}</p>
+          <a class="yt" href="${YT+encodeURIComponent(e.q)}" target="_blank" rel="noopener">
+            ${play} Technika</a>
+        </div>
+      </article>`).join("")}
+  </div>`;
 }).join("");
 
-/* ---------- przełączniki bloków ---------- */
+/* ---------- kafle ---------- */
 $("blocks").innerHTML = ORDER.map(k=>`
-  <label class="blk">
+  <label class="tile" id="tile_${k}">
     <input type="checkbox" id="blk_${k}" ${DEFAULT_ON[k]?"checked":""}>
-    <div><span class="bn">${BLOCKS[k].name}</span><span class="bm" id="meta_${k}"></span></div>
+    <span class="dot"></span>
+    <span class="tn">${BLOCKS[k].name}</span>
+    <span class="tm" id="meta_${k}"></span>
   </label>`).join("");
 
 /* ---------- ustawienia ---------- */
-const CFG = {
+const CFG={
   rounds:{label:"Rundy",val:3,min:1,max:8,step:1,unit:""},
-  work:{label:"Praca",val:30,min:10,max:90,step:5,unit:" s"},
-  rest:{label:"Przerwa",val:30,min:10,max:90,step:5,unit:" s"},
-  rrest:{label:"Między rundami",val:90,min:30,max:180,step:15,unit:" s"}
+  work:{label:"Praca",val:30,min:10,max:90,step:5,unit:"s"},
+  rest:{label:"Przerwa",val:30,min:10,max:90,step:5,unit:"s"},
+  rrest:{label:"Między rundami",val:90,min:30,max:180,step:15,unit:"s"}
 };
 $("steppers").innerHTML = Object.keys(CFG).map(k=>`
   <div class="step">
-    <span class="lbl">${CFG[k].label}</span>
+    <span class="sl">${CFG[k].label}</span>
     <div class="row">
       <button type="button" data-k="${k}" data-d="-1" aria-label="Mniej: ${CFG[k].label}">−</button>
       <output id="v_${k}"></output>
@@ -263,19 +313,17 @@ $("steppers").innerHTML = Object.keys(CFG).map(k=>`
     </div>
   </div>`).join("");
 
-/* ---------- budowa kolejki ---------- */
+/* ---------- kolejka ---------- */
 function segments(k){
   const out=[];
   (BLOCKS[k].ex||[]).forEach((e,i)=>{
-    if(e.sides){
-      out.push({label:e.name+" — lewa",  ex:k+i});
-      out.push({label:e.name+" — prawa", ex:k+i});
-    } else out.push({label:e.name, ex:k+i});
+    if(e.sides){ out.push({label:e.name+" — lewa",ex:k+i}); out.push({label:e.name+" — prawa",ex:k+i}); }
+    else out.push({label:e.name,ex:k+i});
   });
   return out;
 }
 function buildBlock(k){
-  const R=CFG.rounds.val, W=CFG.work.val, P=CFG.rest.val, RR=CFG.rrest.val;
+  const R=CFG.rounds.val,W=CFG.work.val,P=CFG.rest.val,RR=CFG.rrest.val;
   if(k==="warm") return [{t:"work",secs:120,label:"Rozgrzewka — skakanie",sub:"Spokojnie, ciche lądowanie",ex:null}];
   if(k==="fin"){
     const q=[];
@@ -285,19 +333,19 @@ function buildBlock(k){
     }
     return q;
   }
-  const segs=segments(k), q=[];
+  const segs=segments(k),q=[];
   for(let r=1;r<=R;r++){
     segs.forEach(s=>{
-      q.push({t:"work",secs:W,label:s.label,sub:`${BLOCKS[k].name} · runda ${r} z ${R}`,ex:s.ex});
+      q.push({t:"work",secs:W,label:s.label,sub:`${BLOCKS[k].name} · runda ${r}/${R}`,ex:s.ex});
       q.push({t:"rest",secs:P,label:"Przerwa",sub:"Oddychaj spokojnie",ex:null});
     });
-    if(r<R){ const l=q[q.length-1]; l.secs=RR; l.sub="Przerwa między rundami"; }
+    if(r<R){const l=q[q.length-1];l.secs=RR;l.sub="Przerwa między rundami";}
   }
   q.pop();
   return q;
 }
 function build(){
-  const parts = ORDER.filter(k=>$("blk_"+k).checked).map(buildBlock);
+  const parts=ORDER.filter(k=>$("blk_"+k).checked).map(buildBlock);
   const out=[];
   parts.forEach((p,i)=>{
     if(i>0) out.push({t:"rest",secs:CFG.rrest.val,label:"Przerwa",sub:"Zmiana bloku",ex:null});
@@ -305,90 +353,108 @@ function build(){
   });
   return out;
 }
-function mins(s){ return s<60 ? "<1 min" : "≈ "+Math.round(s/60)+" min"; }
+function plural(n){return n===1?"runda":(n%10>=2&&n%10<=4&&(n%100<12||n%100>14))?"rundy":"rund"}
 
+/* ---------- mapa sesji ---------- */
+function drawMap(q){
+  $("map").innerHTML = q.map(s=>`<i class="${s.t==="rest"?"rest":""}"></i>`).join("");
+}
+function markMap(){
+  const els=$("map").children;
+  for(let i=0;i<els.length;i++){
+    els[i].classList.toggle("done", i<idx);
+    els[i].classList.toggle("now", i===idx);
+  }
+}
+
+/* ---------- render ---------- */
 function renderCfg(){
   Object.keys(CFG).forEach(k=>{
     const c=CFG[k];
-    $("v_"+k).textContent = c.val + c.unit;
+    $("v_"+k).textContent=c.val+c.unit;
     document.querySelectorAll(`.row button[data-k="${k}"]`).forEach(b=>{
-      b.disabled = (b.dataset.d==="-1"&&c.val<=c.min)||(b.dataset.d==="1"&&c.val>=c.max);
+      b.disabled=(b.dataset.d==="-1"&&c.val<=c.min)||(b.dataset.d==="1"&&c.val>=c.max);
     });
   });
+  let on=0;
   ORDER.forEach(k=>{
-    const b=BLOCKS[k], t=buildBlock(k).reduce((s,x)=>s+x.secs,0);
-    const n=b.fixed ? b.note : `${segments(k).length} odcinków`;
-    $("meta_"+k).textContent = `${n} · ${mins(t)}`;
-    if($("head_"+k)) $("head_"+k).textContent =
-      b.fixed ? b.name : `${b.name} · ${CFG.work.val} s / ${CFG.rest.val} s · ${CFG.rounds.val} ${plural(CFG.rounds.val)}`;
+    const b=BLOCKS[k], checked=$("blk_"+k).checked;
+    if(checked) on++;
+    $("tile_"+k).classList.toggle("on",checked);
+    const t=buildBlock(k).reduce((s,x)=>s+x.secs,0);
+    const n=b.fixed?b.note:`${segments(k).length} odcinków`;
+    $("meta_"+k).textContent=`${n} · ${t<60?"<1":Math.round(t/60)} min`;
+    if($("wrap_"+k)) $("wrap_"+k).classList.toggle("off",!checked);
+    if($("head_"+k)) $("head_"+k).textContent = b.fixed ? b.note
+      : `${CFG.work.val}s / ${CFG.rest.val}s · ${CFG.rounds.val} ${plural(CFG.rounds.val)}`;
   });
-  const total=build().reduce((s,x)=>s+x.secs,0);
-  $("est").textContent = total ? `Cała sesja ≈ ${Math.round(total/60)} min` : "Zaznacz przynajmniej jeden blok";
+  $("blkCount").textContent=`${on} z ${ORDER.length}`;
+  const q=build(), total=q.reduce((s,x)=>s+x.secs,0);
+  const work=q.filter(x=>x.t==="work").length;
+  $("stats").innerHTML=`
+    <div class="stat hero"><b>${total?Math.round(total/60):0}</b><span>Minut</span></div>
+    <div class="stat"><b>${work}</b><span>Odcinków</span></div>
+    <div class="stat"><b>${on?CFG.rounds.val:0}</b><span>Rund</span></div>`;
+  if(!running) drawMap(q);
 }
-function plural(n){ return n===1?"runda":(n%10>=2&&n%10<=4&&(n%100<12||n%100>14))?"rundy":"rund"; }
+document.querySelectorAll(".chip input").forEach(i=>{
+  i.addEventListener("change",()=>i.closest(".chip").classList.toggle("on",i.checked));
+});
 
-$("steppers").addEventListener("click", e=>{
+$("steppers").addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b) return;
   const c=CFG[b.dataset.k];
   c.val=Math.min(c.max,Math.max(c.min,c.val+Number(b.dataset.d)*c.step));
-  running ? renderCfg() : reset();
+  running?renderCfg():reset();
 });
-$("blocks").addEventListener("change", ()=> running ? renderCfg() : reset());
+$("blocks").addEventListener("change",()=>running?renderCfg():reset());
 
 /* ---------- timer ---------- */
 const panel=$("panel"),bar=$("bar"),clock=$("clock"),phaseEl=$("phase"),
       nowEl=$("now"),nextEl=$("next"),btnStart=$("btnStart");
 let queue=[],idx=0,left=0,timer=null,running=false,wake=null;
 
-function fmt(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+function fmt(s){return pad2(Math.floor(s/60))+":"+pad2(s%60)}
 function paint(){
   const st=queue[idx]; if(!st){finish();return}
   panel.dataset.phase=st.t;
-  phaseEl.textContent = st.t==="work"?"Praca":"Przerwa";
+  phaseEl.textContent=st.t==="work"?"Praca":"Przerwa";
   clock.textContent=fmt(Math.ceil(left));
   nowEl.textContent=st.label;
   const nx=queue[idx+1];
-  nextEl.textContent = st.sub + (nx ? "  ·  dalej: "+nx.label : "  ·  ostatni odcinek");
+  nextEl.textContent=st.sub+(nx?"  →  "+nx.label:"  →  koniec");
   bar.style.transform=`scaleX(${Math.max(0,left/st.secs)})`;
+  markMap();
   document.querySelectorAll(".card").forEach(c=>c.classList.remove("live"));
-  if(st.ex){ const c=document.querySelector(`.card[data-ex="${st.ex}"]`); if(c) c.classList.add("live"); }
+  if(st.ex){const c=document.querySelector(`.card[data-ex="${st.ex}"]`); if(c) c.classList.add("live")}
 }
+
 let ac=null;
 function ensureAudio(){
-  try{
-    ac = ac || new (window.AudioContext||window.webkitAudioContext)();
-    if(ac.state==="suspended") ac.resume();
-  }catch(e){}
+  try{ ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+       if(ac.state==="suspended") ac.resume(); }catch(e){}
 }
 function tone(freq,dur,vol,type,delay){
   if(!ac) return;
   const t=ac.currentTime+(delay||0);
-  const o=ac.createOscillator(), g=ac.createGain();
-  o.type=type||"sine"; o.frequency.setValueAtTime(freq,t);
+  const o=ac.createOscillator(),g=ac.createGain();
+  o.type=type||"sine";o.frequency.setValueAtTime(freq,t);
   g.gain.setValueAtTime(.0001,t);
   g.gain.exponentialRampToValueAtTime(vol,t+.008);
   g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-  o.connect(g); g.connect(ac.destination);
-  o.start(t); o.stop(t+dur+.03);
+  o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur+.03);
 }
-/* krotkie tyknięcie zegara: 5, 4, 3, 2, 1 */
-function tick(){
-  if(!$("optTick").checked) return;
-  ensureAudio(); tone(1180,.05,.14,"triangle",0);
-}
-/* dzwonek na granicy odcinka; wyzszy gdy zaczyna sie praca */
+function tick(){ if(!$("optTick").checked) return; ensureAudio(); tone(1180,.05,.14,"triangle",0); }
 function bell(hi){
   if(!$("optBell").checked) return;
   ensureAudio();
-  const f = hi?784:523;
-  tone(f,1.5,.30,"sine",0);
-  tone(f*2,1.0,.10,"sine",0);
-  tone(f*3,.55,.04,"sine",0);
+  const f=hi?784:523;
+  tone(f,1.5,.30,"sine",0); tone(f*2,1.0,.10,"sine",0); tone(f*3,.55,.04,"sine",0);
 }
 function bellEnd(){
   if(!$("optBell").checked) return;
   ensureAudio();
-  [0,.32,.64].forEach(d=>{ tone(784,1.4,.26,"sine",d); tone(1568,.9,.09,"sine",d); });
+  [0,.32,.64].forEach(d=>{tone(784,1.4,.26,"sine",d);tone(1568,.9,.09,"sine",d)});
 }
 async function keepAwake(on){
   try{
@@ -400,7 +466,7 @@ function step(){
   const E=1e-6, before=Math.ceil(left-E);
   left-=.1;
   const after=Math.ceil(left-E);
-  if(left>0 && after!==before && after>=1 && after<=5) tick();
+  if(left>0&&after!==before&&after>=1&&after<=5) tick();
   if(left<=0){
     idx++;
     if(idx>=queue.length){finish();return}
@@ -412,19 +478,19 @@ function step(){
 function start(){
   if(!queue.length){
     queue=build();
-    if(!queue.length){ nowEl.textContent="Zaznacz przynajmniej jeden blok"; return; }
-    idx=0; left=queue[0].secs;
+    if(!queue.length){nowEl.textContent="Zaznacz blok";return}
+    drawMap(queue); idx=0; left=queue[0].secs;
   }
   ensureAudio();
-  running=true; btnStart.textContent="Pauza"; keepAwake(true);
-  timer=setInterval(step,100); paint();
+  running=true;btnStart.textContent="Pauza";keepAwake(true);
+  timer=setInterval(step,100);paint();
 }
 function pause(){running=false;btnStart.textContent="Wznów";clearInterval(timer);keepAwake(false)}
 function reset(){
   clearInterval(timer);running=false;queue=[];idx=0;left=CFG.work.val;keepAwake(false);
   btnStart.textContent="Start";panel.dataset.phase="idle";
   phaseEl.textContent="Gotowe";clock.textContent=fmt(CFG.work.val);
-  nowEl.textContent="Rozłóż matę i naciśnij start";nextEl.textContent="";
+  nowEl.textContent="Rozłóż matę";nextEl.textContent="";
   bar.style.transform="scaleX(1)";
   document.querySelectorAll(".card").forEach(c=>c.classList.remove("live"));
   renderCfg();
@@ -433,20 +499,21 @@ function finish(){
   clearInterval(timer);running=false;queue=[];idx=0;keepAwake(false);bellEnd();
   btnStart.textContent="Jeszcze raz";panel.dataset.phase="idle";
   phaseEl.textContent="Koniec";clock.textContent="00:00";
-  nowEl.textContent="Zrobione";nextEl.textContent="Ta sama pora, za dwa dni.";
+  nowEl.textContent="Zrobione";nextEl.textContent="Ta sama pora, za dwa dni";
   bar.style.transform="scaleX(1)";
   document.querySelectorAll(".card").forEach(c=>c.classList.remove("live"));
+  renderCfg();
 }
 btnStart.onclick=()=>running?pause():start();
 $("btnSkip").onclick=()=>{
   if(!queue.length)return;
   idx++; if(idx>=queue.length){finish();return}
-  left=queue[idx].secs; paint();
+  left=queue[idx].secs;paint();
 };
 $("btnReset").onclick=reset;
 document.addEventListener("keydown",e=>{
   if(e.code==="Space"&&!["INPUT","BUTTON"].includes(e.target.tagName)){
-    e.preventDefault(); running?pause():start();
+    e.preventDefault();running?pause():start();
   }
 });
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&running)keepAwake(true)});

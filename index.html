@@ -349,8 +349,60 @@ footer b{color:var(--fg);font-weight:700}
 .chip.act:active{transform:scale(.97)}
 .chip.act.ghost{color:var(--dim)}
 .chip.act input[type=file]{position:absolute;opacity:0;width:0;height:0}
+.fsrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  background:var(--surf);border-radius:var(--r);padding:14px 16px;margin:0 0 10px;
+  border-left:3px solid var(--line2)}
+.fsrow.on{border-left-color:var(--red)}
+.fsrow .fst{flex:1;min-width:180px;font-size:.84rem;line-height:1.4;color:var(--dim)}
+.fsrow .fst b{color:var(--fg);font-weight:700}
 .hint{font-family:"JetBrains Mono",monospace;font-size:.6rem;letter-spacing:.06em;
   color:var(--dim);line-height:1.6;margin:12px 2px 0}
+
+
+/* ---------- powtórzenia, podmiana, intro, progresja ---------- */
+.card .cbody{flex:1;min-width:0}
+.card .reps{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:.62rem;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--red);
+  background:rgba(255,59,43,.12);border-radius:999px;padding:5px 11px;margin:0 0 9px}
+.card.swapped{border-color:rgba(255,59,43,.35)}
+.cact{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.swapbtn{font-family:"JetBrains Mono",monospace;font-size:.62rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--dim);background:transparent;
+  border:1.5px solid var(--line);border-radius:999px;padding:9px 14px;cursor:pointer;
+  transition:border-color .15s,color .15s,background .15s}
+.swapbtn:hover{border-color:var(--red);color:var(--fg)}
+.swapbtn.on{border-color:var(--red);color:var(--red);background:rgba(255,59,43,.10)}
+.swapbtn:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+
+.introbox{background:linear-gradient(155deg,rgba(255,59,43,.14),rgba(255,59,43,.03));
+  border-radius:var(--rl);padding:20px 20px 18px;margin:30px 0 0}
+.introbox h3{font-family:"Oswald","Archivo",sans-serif;font-weight:600;text-transform:uppercase;
+  font-size:1.1rem;margin:0 0 10px;letter-spacing:-.01em}
+.introbox p{margin:0 0 10px;font-size:.9rem;line-height:1.55;color:var(--dim)}
+.introbox p b{color:var(--fg)}
+
+.prog{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  background:var(--surf);border-left:3px solid var(--red);border-radius:var(--r);
+  padding:15px 17px;margin:12px 0 0}
+.prog span{flex:1;min-width:190px;font-size:.87rem;line-height:1.45;color:var(--dim)}
+.prog b{color:var(--fg);font-weight:700}
+
+/* ---------- szersze ekrany i orientacja pozioma ---------- */
+@media (min-width:720px){
+  .wrap{max-width:860px}
+  .tiles{grid-template-columns:repeat(4,1fr)}
+  .grid{grid-template-columns:repeat(4,1fr)}
+  #lists{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;align-items:start}
+  .blockwrap{margin-top:34px}
+  .hero{min-height:min(46vh,380px)}
+}
+@media (orientation:landscape) and (max-height:560px){
+  .panel{position:relative;top:0}
+  .clock{font-size:3.6rem;margin-top:10px}
+  .hero{min-height:200px}
+  .panel-in{padding:14px 18px 2px}
+  .now{margin-top:10px;font-size:1.05rem}
+}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -409,9 +461,11 @@ footer b{color:var(--fg);font-weight:700}
     </div>
   </section>
 
+  <div id="intro"></div>
   <div class="sechead"><span class="lbl">Zbuduj sesję</span><span class="lbl" id="blkCount"></span></div>
   <div class="tiles" id="blocks"></div>
   <div class="stats" id="stats"></div>
+  <div id="progressHint"></div>
 
   <div class="sechead"><span class="lbl">Czas i dźwięk</span></div>
   <div class="grid" id="steppers"></div>
@@ -426,6 +480,7 @@ footer b{color:var(--fg);font-weight:700}
 
   <div class="sechead"><span class="lbl">Historia</span><span class="lbl" id="histSummary"></span></div>
   <div class="histlist" id="histList"></div>
+  <div class="fsrow" id="fsRow"></div>
   <div class="chips">
     <button class="chip act" id="btnExport">Eksportuj JSON</button>
     <button class="chip act" id="btnShare">Udostepnij</button>
@@ -446,37 +501,77 @@ footer b{color:var(--fg);font-weight:700}
 <script>
 /* ---------- dane ---------- */
 const BLOCKS = {
-  warm:{ name:"Rozgrzewka", note:"2 min skakania", fixed:true, list:false },
+  warm:{ name:"Rozgrzewka", fixed:true, list:true, note:"4 ćwiczenia", ex:[
+    { tag:"Krążenie", name:"Marsz lub skakanie w miejscu", secs:60,
+      cue:"Spokojne tempo, stopy miękko. Chodzi o rozgrzanie, nie o zmęczenie.",
+      q:"rozgrzewka marsz w miejscu technika" },
+    { tag:"Kręgosłup", name:"Koci grzbiet", secs:40,
+      cue:"Klęk podparty. Na wdechu delikatnie wypnij klatkę, na wydechu zaokrąglij plecy. Powoli, kręg po kręgu.",
+      q:"koci grzbiet cat cow technika" },
+    { tag:"Biodra", name:"Krążenia bioder w podporze", secs:40,
+      cue:"Klęk podparty, unieś kolano w bok i zataczaj nim koła. Po połowie czasu zmiana nogi.",
+      q:"krążenia bioder rozgrzewka technika" },
+    { tag:"Mobilność", name:"Wykrok z rotacją", secs:40,
+      cue:"Krok w wykrok, dłoń obok stopy, drugą ręką sięgaj do sufitu skręcając tułów. Strony naprzemiennie.",
+      q:"wykrok z rotacją rozciąganie technika" }
+  ]},
   core:{ name:"Core", list:true, ex:[
     { tag:"Antywyprost", name:"Dead bug",
       cue:"Leż na plecach, ręce w górę, kolana nad biodrami. Opuszczaj przeciwległą rękę i nogę. Lędźwie przyklejone do podłogi — jeśli odstają, zmniejsz zakres.",
-      q:"dead bug ćwiczenie technika" },
+      q:"dead bug ćwiczenie technika",
+      alt:{ label:"łatwiej", name:"Dead bug — same nogi",
+        cue:"Ręce zostają uniesione nieruchomo, pracują tylko nogi. Ta sama zasada: lędźwie przyklejone do podłogi.",
+        q:"dead bug wersja łatwiejsza technika" } },
     { tag:"Antywyprost", name:"Deska na przedramionach",
       cue:"Łokcie pod barkami, pośladki napięte, biodra w jednej linii z tułowiem. Nie unoś bioder do góry i nie zapadaj się w lędźwiach.",
-      q:"deska plank technika dla początkujących" },
-    { tag:"Stabilizacja boczna", name:"Deska bokiem na kolanach",
-      cue:"Łokieć pod barkiem, kolana ugięte pod kątem prostym. Wypchnij biodro wysoko i trzymaj. Zmiana strony po połowie czasu.",
-      q:"deska bokiem na kolanach technika" },
+      q:"deska plank technika dla początkujących",
+      alt:{ label:"łatwiej", name:"Deska na kolanach",
+        cue:"Kolana na macie, reszta bez zmian: łokcie pod barkami, biodra w linii z tułowiem, pośladki napięte.",
+        q:"deska na kolanach plank technika" } },
+    { tag:"Stabilizacja boczna", name:"Deska bokiem na kolanach", sides:true,
+      cue:"Łokieć pod barkiem, kolana ugięte pod kątem prostym. Wypchnij biodro wysoko i trzymaj bez opadania.",
+      q:"deska bokiem na kolanach technika",
+      alt:{ label:"dynamicznie", name:"Unoszenie bioder w leżeniu bokiem",
+        cue:"Ta sama praca boku, ale ruchem: opuszczasz i unosisz biodro zamiast trzymać w bezruchu.",
+        q:"unoszenie bioder leżenie bokiem technika" } },
     { tag:"Antyrotacja", name:"Bird dog",
-      cue:"Klęk podparty. Wyprostuj przeciwległą rękę i nogę do poziomu. Miednica nieruchoma — jakby balansowała szklankę wody na krzyżu.",
-      q:"bird dog ćwiczenie technika" },
-    { tag:"Tył i pośladki", name:"Mostek biodrowy",
+      cue:"Klęk podparty. Wyprostuj przeciwległą rękę i nogę do poziomu, strony naprzemiennie. Miednica nieruchoma — jakby balansowała szklankę wody na krzyżu.",
+      q:"bird dog ćwiczenie technika",
+      alt:{ label:"łatwiej", name:"Bird dog — sama ręka",
+        cue:"Wyprostuj tylko rękę, noga zostaje na macie. Łatwiej utrzymać miednicę bez obrotu.",
+        q:"bird dog wersja łatwiejsza technika" } },
+    { tag:"Tył i pośladki", name:"Mostek biodrowy", reps:"10–15 powtórzeń",
       cue:"Leż na plecach, stopy blisko pośladków. Wypchnij biodra siłą pośladków, nie lędźwiami. Na górze krótka pauza, potem powoli w dół.",
-      q:"mostek biodrowy glute bridge technika" }
+      q:"mostek biodrowy glute bridge technika",
+      alt:{ label:"trudniej", name:"Mostek jednonóż", sides:true, reps:"6–10 na nogę",
+        cue:"Jedna stopa na podłodze, druga noga wyprostowana w linii tułowia. Biodra unoszą się równo, bez przechyłu na bok.",
+        q:"mostek jednonóż technika" } }
   ]},
   legs:{ name:"Nogi i pośladki", list:true, ex:[
-    { tag:"Wzorzec przysiadu", name:"Przysiad z krzesłem",
+    { tag:"Wzorzec przysiadu", name:"Przysiad z krzesłem", reps:"8–12 powtórzeń",
       cue:"Krzesło za tobą. Siadaj biodrami do tyłu aż pośladki dotkną siedziska, wstań bez odbijania się. Kolana w linii ze stopami, pięty na podłodze.",
-      q:"przysiad do krzesła technika box squat" },
-    { tag:"Jednonóż", name:"Przysiad rozkroczny", sides:true,
+      q:"przysiad do krzesła technika box squat",
+      alt:{ label:"bez krzesła", name:"Przysiad z podparciem o blat", reps:"8–12 powtórzeń",
+        cue:"Trzymasz się blatu albo framugi i schodzisz niżej z kontrolą. Dobre, gdy nie ma krzesła albo balans jest słaby.",
+        q:"przysiad z podparciem technika" } },
+    { tag:"Jednonóż", name:"Przysiad rozkroczny", sides:true, reps:"6–10 na nogę",
       cue:"Nogi w wykroku, tylna stopa na podłodze. Schodzisz pionowo w dół, tylne kolano do podłogi. Ciężar głównie na przedniej nodze. Wersja bułgarska dopiero, gdy to jest łatwe.",
-      q:"przysiad rozkroczny split squat technika" },
-    { tag:"Tył uda", name:"Zawias biodrowy",
+      q:"przysiad rozkroczny split squat technika",
+      alt:{ label:"łatwiej", name:"Zakroki w miejscu", sides:true, reps:"8–10 na nogę",
+        cue:"Z pozycji stojącej cofasz nogę w wykrok i wracasz. Krótszy czas pod obciążeniem, łatwiej złapać balans.",
+        q:"zakroki w miejscu wykroki technika" } },
+    { tag:"Tył uda", name:"Zawias biodrowy", reps:"10–12 powtórzeń",
       cue:"Stopy na szerokość bioder, kolana lekko ugięte. Biodra wypychasz do tyłu, plecy proste, dłonie suną po udach. Czujesz ciągnięcie z tyłu ud — to znak, że robisz dobrze.",
-      q:"zawias biodrowy hip hinge technika" },
-    { tag:"Pośladek średni", name:"Odwodzenie w leżeniu bokiem", sides:true,
+      q:"zawias biodrowy hip hinge technika",
+      alt:{ label:"z podpowiedzią", name:"Zawias przy ścianie", reps:"10–12 powtórzeń",
+        cue:"Stań jakieś 20 cm od ściany i wypychaj biodra do tyłu aż dotkną ściany. Ściana sama uczy właściwego ruchu.",
+        q:"hip hinge przy ścianie technika" } },
+    { tag:"Pośladek średni", name:"Odwodzenie w leżeniu bokiem", sides:true, reps:"12–15 na stronę",
       cue:"Leż na boku, nogi wyprostowane w linii tułowia. Unoś górną nogę powoli, palce skierowane do przodu, nie do sufitu. Miednica nie obraca się do tyłu.",
-      q:"odwodzenie nogi w leżeniu bokiem technika" }
+      q:"odwodzenie nogi w leżeniu bokiem technika",
+      alt:{ label:"inaczej", name:"Muszelka", sides:true, reps:"12–15 na stronę",
+        cue:"Leż na boku, kolana ugięte, stopy razem. Otwierasz kolano do góry nie odrywając stóp od siebie i nie odchylając miednicy.",
+        q:"muszelka clamshell ćwiczenie technika" } }
   ]},
   fin:{ name:"Finisz", note:"3 × 25 s skakania", fixed:true, list:true, ex:[
     { tag:"Kondycja", name:"Skakanka lub pajacyki",
@@ -492,23 +587,53 @@ const $=id=>document.getElementById(id);
 const pad2=n=>String(n).padStart(2,"0");
 
 /* ---------- listy ---------- */
-$("lists").innerHTML = ORDER.filter(k=>BLOCKS[k].list).map(k=>{
-  const b=BLOCKS[k];
-  return `<div class="blockwrap" id="wrap_${k}">
-    <div class="bh"><h2>${b.name}</h2><span class="lbl" id="head_${k}"></span></div>
-    ${b.ex.map((e,idx2)=>`
-      <article class="card" data-ex="${k}${idx2}">
-        <div class="num">${pad2(idx2+1)}</div>
-        <div>
-          <p class="tag">${e.tag}${e.sides?" · obie strony":""}</p>
-          <h3>${e.name}</h3>
-          <p>${e.cue}</p>
-          <a class="yt" href="${YT+encodeURIComponent(e.q)}" target="_blank" rel="noopener">
-            ${play} Technika</a>
-        </div>
-      </article>`).join("")}
-  </div>`;
-}).join("");
+let swaps={};
+function exOf(k,i){
+  const base=BLOCKS[k].ex[i];
+  if(swaps[k+i]&&base.alt){
+    const o=Object.assign({},base,base.alt);
+    o.swapped=true;
+    if(!("sides" in base.alt)) o.sides=base.sides;
+    if(!("reps" in base.alt)) o.reps=base.reps;
+    return o;
+  }
+  return base;
+}
+function renderLists(){
+  $("lists").innerHTML = ORDER.filter(k=>BLOCKS[k].list).map(k=>{
+    const bl=BLOCKS[k];
+    return `<div class="blockwrap" id="wrap_${k}">
+      <div class="bh"><h2>${bl.name}</h2><span class="lbl" id="head_${k}"></span></div>
+      ${bl.ex.map((raw,i)=>{
+        const e=exOf(k,i);
+        const meta=[];
+        if(e.sides) meta.push("obie strony");
+        if(raw.secs) meta.push(raw.secs+" s");
+        return `<article class="card${e.swapped?" swapped":""}" data-ex="${k}${i}">
+          <div class="num">${pad2(i+1)}</div>
+          <div class="cbody">
+            <p class="tag">${e.tag}${meta.length?" · "+meta.join(" · "):""}</p>
+            <h3>${e.name}</h3>
+            ${e.reps?`<p class="reps">${e.reps}</p>`:""}
+            <p>${e.cue}</p>
+            <div class="cact">
+              <a class="yt" href="${YT+encodeURIComponent(e.q)}" target="_blank" rel="noopener">
+                ${play} Technika</a>
+              ${raw.alt?`<button class="swapbtn${e.swapped?" on":""}" data-swap="${k}${i}">${e.swapped?"↩ wróć":"⇄ "+raw.alt.label}</button>`:""}
+            </div>
+          </div>
+        </article>`;
+      }).join("")}
+    </div>`;
+  }).join("");
+}
+renderLists();
+$("lists").addEventListener("click",e=>{
+  const sw=e.target.closest("[data-swap]");
+  if(sw){ const key=sw.dataset.swap; swaps[key]=!swaps[key]; renderLists(); running?renderCfg():reset(); return; }
+  const yt=e.target.closest(".yt");
+  if(yt&&running){ pause(); }   // wyjście do YouTube nie zjada sesji
+});
 
 /* ---------- kafle ---------- */
 $("blocks").innerHTML = ORDER.map(k=>`
@@ -545,10 +670,15 @@ function loadHist(){
   if(!canStore) return memHist.slice();
   try{const v=JSON.parse(localStorage.getItem(HKEY)||"[]");return Array.isArray(v)?v:[]}catch(e){return []}
 }
-function saveHist(a){
+function saveHistRaw(a){
   a.sort((x,y)=>y.ts-x.ts);
   if(!canStore){memHist=a.slice();return false}
   try{localStorage.setItem(HKEY,JSON.stringify(a));return true}catch(e){return false}
+}
+function saveHist(a){
+  const ok=saveHistRaw(a);
+  if(fh) fsWrite();          // kazda zmiana ladujue w pliku, bez klikania
+  return ok;
 }
 function loadPrefs(){
   if(!canStore) return memPrefs;
@@ -558,6 +688,8 @@ function savePrefs(){
   const o={cfg:{},blocks:{},snd:{}};
   Object.keys(CFG).forEach(k=>o.cfg[k]=CFG[k].val);
   ORDER.forEach(k=>o.blocks[k]=$("blk_"+k).checked);
+  o.swaps=swaps;
+  const prev=loadPrefs(); if(prev&&prev.introSeen) o.introSeen=true;
   ["optBell","optTick","optVib","optVoice"].forEach(k=>{ if($(k)) o.snd[k]=$(k).checked; });
   if(!canStore){memPrefs=o;return}
   try{localStorage.setItem(PKEY,JSON.stringify(o))}catch(e){}
@@ -567,6 +699,7 @@ function applyPrefs(){
   if(o.cfg) Object.keys(o.cfg).forEach(k=>{if(CFG[k]&&typeof o.cfg[k]==="number")CFG[k].val=o.cfg[k]});
   if(o.blocks) ORDER.forEach(k=>{if(typeof o.blocks[k]==="boolean")$("blk_"+k).checked=o.blocks[k]});
   if(o.snd) Object.keys(o.snd).forEach(k=>{if($(k))$(k).checked=!!o.snd[k]});
+  if(o.swaps&&typeof o.swaps==="object"){ swaps=o.swaps; renderLists(); }
   document.querySelectorAll(".chip input").forEach(inp=>inp.closest(".chip").classList.toggle("on",inp.checked));
 }
 function dayKey(d){return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate())}
@@ -640,18 +773,129 @@ function importJSON(file){
   r.readAsText(file);
 }
 
+
+/* ================= AUTO-ZAPIS DO PLIKU (File System Access) ================= */
+const FSA = ("showSaveFilePicker" in window);
+let fh=null, fsState=FSA?"none":"unsupported", lastSync=0, fsBusy=false;
+
+function idbOpen(){return new Promise((res,rej)=>{
+  const r=indexedDB.open("core-fs",1);
+  r.onupgradeneeded=()=>{ r.result.createObjectStore("kv") };
+  r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);
+})}
+async function idbGet(k){
+  try{ const db=await idbOpen();
+    return await new Promise((res,rej)=>{
+      const t=db.transaction("kv","readonly").objectStore("kv").get(k);
+      t.onsuccess=()=>res(t.result); t.onerror=()=>rej(t.error);
+    });
+  }catch(e){ return null }
+}
+async function idbSet(k,v){
+  try{ const db=await idbOpen();
+    return await new Promise((res,rej)=>{
+      const t=db.transaction("kv","readwrite").objectStore("kv").put(v,k);
+      t.onsuccess=()=>res(1); t.onerror=()=>rej(t.error);
+    });
+  }catch(e){ return null }
+}
+async function fsPerm(mode){
+  if(!fh||!fh.queryPermission) return "prompt";
+  try{ return await fh.queryPermission({mode:mode||"readwrite"}) }catch(e){ return "prompt" }
+}
+async function fsWrite(){
+  if(!fh||fsBusy) return false;
+  fsBusy=true;
+  try{
+    if((await fsPerm())!=="granted"){ fsBusy=false; return false }
+    const w=await fh.createWritable();
+    await w.write(JSON.stringify(payload(),null,2));
+    await w.close();
+    lastSync=Date.now(); fsState="connected"; renderFs(); fsBusy=false; return true;
+  }catch(e){ fsBusy=false; return false }
+}
+async function fsRead(){
+  if(!fh) return 0;
+  try{
+    const f=await fh.getFile(); const txt=await f.text();
+    if(!txt.trim()) return 0;
+    const o=JSON.parse(txt); const inc=Array.isArray(o)?o:(o.sessions||[]);
+    if(!Array.isArray(inc)) return 0;
+    const cur=loadHist(), seen={}; cur.forEach(e=>seen[e.id]=true);
+    let added=0;
+    inc.forEach(e=>{ if(e&&e.id&&!seen[e.id]&&e.ts&&e.date){cur.push(e);seen[e.id]=true;added++} });
+    if(added){ saveHistRaw(cur); renderHistory(); buildWeek(); }
+    return added;
+  }catch(e){ return 0 }
+}
+async function fsConnect(){
+  try{
+    fh=await window.showSaveFilePicker({
+      suggestedName:"core-historia.json",
+      types:[{description:"Historia treningow (JSON)",accept:{"application/json":[".json"]}}]
+    });
+    await idbSet("fh",fh);
+    await fsRead(); await fsWrite();
+  }catch(e){ /* uzytkownik anulowal */ }
+  renderFs();
+}
+async function fsGrant(){
+  if(!fh) return fsConnect();
+  try{
+    const p=await fh.requestPermission({mode:"readwrite"});
+    if(p==="granted"){ await fsRead(); await fsWrite(); }
+  }catch(e){}
+  renderFs();
+}
+async function fsRestore(){
+  if(!FSA){ fsState="unsupported"; renderFs(); return }
+  fh=await idbGet("fh");
+  if(!fh){ fsState="none"; renderFs(); return }
+  const p=await fsPerm();
+  if(p==="granted"){ fsState="connected"; await fsRead(); await fsWrite(); }
+  else { fsState="needgesture"; }
+  renderFs();
+}
+function renderFs(){
+  const row=$("fsRow"); if(!row) return;
+  const t=lastSync?new Date(lastSync):null;
+  const hhmm=t?pad2(t.getHours())+":"+pad2(t.getMinutes()):"";
+  let txt="",btn="";
+  if(fsState==="unsupported"){
+    txt="<b>Auto-zapis do pliku niedostepny w tej przegladarce.</b> Historia i tak zapisuje sie sama w pamieci urzadzenia \u2014 plik JSON pobierzesz recznie ponizej.";
+  }else if(fsState==="none"){
+    txt="<b>Auto-zapis do pliku: wylaczony.</b> Wskaz plik raz, a od tej pory kazda sesja dopisze sie do niego sama.";
+    btn='<button class="chip act" id="btnFs">Wybierz plik</button>';
+  }else if(fsState==="needgesture"){
+    txt="<b>Plik kopii czeka na potwierdzenie.</b> Przegladarka wymaga jednego dotkniecia po restarcie.";
+    btn='<button class="chip act" id="btnFs">Polacz ponownie</button>';
+  }else{
+    txt="<b>Auto-zapis wlaczony \u2713</b> Zapisano o "+hhmm+". Kazda zmiana trafia do pliku bez klikania.";
+    btn='<button class="chip act" id="btnFs">Zmien plik</button>';
+  }
+  row.classList.toggle("on",fsState==="connected");
+  row.innerHTML='<span class="fst">'+txt+'</span>'+btn;
+  const b=$("btnFs");
+  if(b) b.onclick=()=> fsState==="needgesture" ? fsGrant() : fsConnect();
+}
+
 /* ================= KOLEJKA ================= */
 function segments(k){
   const out=[];
-  (BLOCKS[k].ex||[]).forEach((e,n)=>{
-    if(e.sides){ out.push({label:e.name+" — lewa",ex:k+n}); out.push({label:e.name+" — prawa",ex:k+n}); }
-    else out.push({label:e.name,ex:k+n});
+  (BLOCKS[k].ex||[]).forEach((raw,n)=>{
+    const e=exOf(k,n);
+    const extra=e.reps?" · "+e.reps:"";
+    if(e.sides){
+      out.push({label:e.name+" — lewa",ex:k+n,extra:extra,secs:raw.secs});
+      out.push({label:e.name+" — prawa",ex:k+n,extra:extra,secs:raw.secs});
+    } else out.push({label:e.name,ex:k+n,extra:extra,secs:raw.secs});
   });
   return out;
 }
 function buildBlock(k){
   const R=CFG.rounds.val,W=CFG.work.val,P=CFG.rest.val,RR=CFG.rrest.val;
-  if(k==="warm") return [{t:"work",secs:120,label:"Rozgrzewka — skakanie",sub:"Spokojnie, ciche lądowanie",ex:null}];
+  if(k==="warm") return BLOCKS.warm.ex.map((e,n)=>
+    ({t:"work",secs:e.secs,label:e.name,sub:"Rozgrzewka · "+(n+1)+"/"+BLOCKS.warm.ex.length,ex:"warm"+n}));
   if(k==="fin"){
     const q=[];
     for(let x=1;x<=3;x++){
@@ -663,7 +907,7 @@ function buildBlock(k){
   const segs=segments(k),q=[];
   for(let r=1;r<=R;r++){
     segs.forEach(sg=>{
-      q.push({t:"work",secs:W,label:sg.label,sub:BLOCKS[k].name+" · runda "+r+"/"+R,ex:sg.ex});
+      q.push({t:"work",secs:W,label:sg.label,sub:BLOCKS[k].name+" · runda "+r+"/"+R+(sg.extra||""),ex:sg.ex});
       q.push({t:"rest",secs:P,label:"Przerwa",sub:"Oddychaj spokojnie",ex:null});
     });
     if(r<R){const l=q[q.length-1];l.secs=RR;l.sub="Przerwa między rundami";}
@@ -738,7 +982,7 @@ function renderCfg(){
     if(checked) on++;
     $("tile_"+k).classList.toggle("on",checked);
     const t=buildBlock(k).reduce((a,x)=>a+x.secs,0);
-    const n=b.fixed?b.note:segments(k).length+" odcinków";
+    const n=b.fixed?(b.note||segments(k).length+" odcinków"):segments(k).length+" odcinków";
     $("meta_"+k).textContent=n+" · "+(t<60?"<1":Math.round(t/60))+" min";
     if($("wrap_"+k)) $("wrap_"+k).classList.toggle("off",!checked);
     if($("head_"+k)) $("head_"+k).textContent = b.fixed ? b.note
@@ -754,7 +998,41 @@ function renderCfg(){
     '<div class="stat"><b>'+work+'</b><span>Odcinków</span></div>'+
     '<div class="stat"><b>'+(on?CFG.rounds.val:0)+'</b><span>Rund</span></div>';
   if(!running) drawMap(q);
+  renderProgress();
   savePrefs();
+}
+
+
+/* ================= SUGESTIA PROGRESJI ================= */
+function renderProgress(){
+  const box=$("progressHint"); if(!box) return;
+  const ses=loadHist().filter(e=>e.type==="session"&&typeof e.work==="number");
+  const last=ses.slice(0,6);
+  const enough = last.length>=6 && last.every(e=>e.work===last[0].work);
+  const target = CFG.work.val+CFG.work.step;
+  if(!enough || CFG.work.val!==last[0].work || target>CFG.work.max){ box.innerHTML=""; return; }
+  box.innerHTML='<div class="prog"><span><b>Sześć sesji po '+last[0].work+' s.</b> '+
+    'Technika zdążyła się utrwalić — dołóż czas, nie rundę.</span>'+
+    '<button class="chip act" id="btnProg">Ustaw '+target+' s</button></div>';
+  $("btnProg").onclick=()=>{ CFG.work.val=target; running?renderCfg():reset(); };
+}
+
+/* ================= EKRAN POWITALNY ================= */
+function renderIntro(){
+  const box=$("intro"); if(!box) return;
+  const pr=loadPrefs();
+  if(pr&&pr.introSeen){ box.innerHTML=""; return; }
+  box.innerHTML='<div class="introbox">'+
+    '<h3>Jak to działa</h3>'+
+    '<p>Zaznacz bloki, z których ma się złożyć sesja — na start wystarczy sam <b>Core</b>. '+
+    'Suwaki niżej ustawiają czas pracy i przerwy. Naciśnij Start, połóż telefon obok maty i słuchaj sygnałów.</p>'+
+    '<p>Ukończona sesja zapisze się sama i pojawi w pasku tygodnia. Dni cardio odhaczasz przyciskiem.</p>'+
+    '<button class="chip act" id="btnIntro">Rozumiem</button></div>';
+  $("btnIntro").onclick=()=>{
+    const o=loadPrefs()||{}; o.introSeen=true;
+    try{ if(canStore) localStorage.setItem(PKEY,JSON.stringify(o)); else memPrefs=o; }catch(e){}
+    renderIntro();
+  };
 }
 
 /* ================= DŹWIĘK / GŁOS / WIBRACJA ================= */
@@ -944,9 +1222,14 @@ document.addEventListener("visibilitychange",()=>{
 
 /* ================= START ================= */
 applyPrefs();
+renderIntro();
 renderHistory();
 buildWeek();
 reset();
+try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+fsRestore();
+window.addEventListener("pagehide",()=>{ if(fh) fsWrite(); });
+document.addEventListener("visibilitychange",()=>{ if(document.hidden&&fh) fsWrite(); });
 $("storeHint").textContent = canStore
   ? "Historia zapisuje się lokalnie na tym urządzeniu. Eksport tworzy plik JSON — możesz go wysłać na Dysk Google przez systemowe udostępnianie."
   : "Uwaga: w tym podglądzie pamięć lokalna jest wyłączona, więc historia nie przetrwa odświeżenia. Po wgraniu pliku na telefon lub hosting zapis działa normalnie.";
